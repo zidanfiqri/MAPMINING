@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IUP Data Explorer – Minerba ESDM</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f4f5f7;
+      color: #222;
+    }
+
+    #header {
+      background: #16213e;
+      color: #fff;
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    #header h1 {
+      font-size: 16px;
+      font-weight: 600;
+      color: #e2b96f;
+    }
+
+    #header a {
+      font-size: 12px;
+      color: #7ecbff;
+      text-decoration: none;
+      margin-left: auto;
+    }
+
+    #header a:hover {
+      text-decoration: underline;
+    }
+
+    .wrap {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    /* Stat cards */
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .stat-card {
+      background: #fff;
+      border-radius: 10px;
+      padding: 14px 16px;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+    }
+
+    .stat-card .label {
+      font-size: 12px;
+      color: #666;
+      margin-bottom: 4px;
+    }
+
+    .stat-card .value {
+      font-size: 26px;
+      font-weight: 600;
+      color: #16213e;
+    }
+
+    /* Charts */
+    .chart-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .chart-box {
+      background: #fff;
+      border-radius: 10px;
+      padding: 16px;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+    }
+
+    .chart-box h3 {
+      font-size: 13px;
+      color: #666;
+      margin-bottom: 12px;
+      font-weight: 500;
+    }
+
+    .chart-box-full {
+      background: #fff;
+      border-radius: 10px;
+      padding: 16px;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+      margin-bottom: 20px;
+    }
+
+    .chart-box-full h3 {
+      font-size: 13px;
+      color: #666;
+      margin-bottom: 12px;
+      font-weight: 500;
+    }
+
+    /* Filter bar */
+    .filter-bar {
+      background: #fff;
+      border-radius: 10px;
+      padding: 16px;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+      margin-bottom: 16px;
+    }
+
+    .filter-bar h3 {
+      font-size: 13px;
+      color: #666;
+      margin-bottom: 10px;
+      font-weight: 500;
+    }
+
+    .filters {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    select,
+    input[type=text] {
+      font-size: 13px;
+      padding: 6px 10px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      background: #fff;
+      color: #222;
+      outline: none;
+      cursor: pointer;
+    }
+
+    select:focus,
+    input:focus {
+      border-color: #378ADD;
+    }
+
+    input[type=text] {
+      flex: 1;
+      min-width: 180px;
+    }
+
+    .row-count {
+      font-size: 12px;
+      color: #888;
+      white-space: nowrap;
+    }
+
+    button.btn {
+      font-size: 12px;
+      padding: 6px 14px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      background: #fff;
+      cursor: pointer;
+      color: #222;
+    }
+
+    button.btn:hover {
+      background: #f0f0f0;
+    }
+
+    button.btn-primary {
+      background: #16213e;
+      color: #e2b96f;
+      border-color: #16213e;
+    }
+
+    button.btn-primary:hover {
+      background: #1e2d5a;
+    }
+
+    /* Table */
+    .table-wrap {
+      background: #fff;
+      border-radius: 10px;
+      padding: 16px;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      table-layout: fixed;
+    }
+
+    thead th {
+      text-align: left;
+      padding: 8px 10px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #555;
+      border-bottom: 2px solid #eee;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    tbody tr:hover {
+      background: #f7f9fc;
+    }
+
+    tbody td {
+      padding: 7px 10px;
+      border-bottom: 1px solid #f0f0f0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      color: #333;
+    }
+
+    .pagination {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      margin-top: 12px;
+    }
+
+    .page-info {
+      font-size: 12px;
+      color: #888;
+    }
+
+    /* No data state */
+    .no-data {
+      text-align: center;
+      padding: 40px;
+      color: #888;
+    }
+
+    .no-data h2 {
+      font-size: 16px;
+      margin-bottom: 8px;
+    }
+
+    .no-data p {
+      font-size: 13px;
+    }
+
+    .no-data code {
+      background: #f0f0f0;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 12px;
+    }
+
+    @media (max-width:640px) {
+      .chart-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="header">
+    <h1>📊 IUP Data Explorer – Minerba ESDM</h1>
+    <a href="iup_map.html">🗺 Open Map View →</a>
+  </div>
+
+  <div class="wrap">
+
+    <!-- Stat cards -->
+    <div class="stat-grid" id="stat-cards">
+      <div class="stat-card">
+        <div class="label">Status</div>
+        <div class="value" id="load-status" style="font-size:14px;color:#888;">Loading CSV…</div>
+      </div>
+    </div>
+
+    <!-- Charts -->
+    <div class="chart-grid">
+      <div class="chart-box">
+        <h3>Records by commodity</h3><canvas id="chart-komoditas" height="220"></canvas>
+      </div>
+      <div class="chart-box">
+        <h3>Records by permit type</h3><canvas id="chart-izin" height="220"></canvas>
+      </div>
+    </div>
+    <div class="chart-box-full">
+      <h3>Top 10 provinces by permit count</h3><canvas id="chart-provinsi" height="130"></canvas>
+    </div>
+
+    <!-- Filters -->
+    <div class="filter-bar">
+      <h3>Filter &amp; Search</h3>
+      <div class="filters">
+        <select id="f-komoditas"></select>
+        <select id="f-provinsi"></select>
+        <select id="f-izin"></select>
+        <input type="text" id="f-search" placeholder="Search company name…" />
+        <span class="row-count" id="row-count"></span>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="table-wrap">
+      <table>
+        <thead id="tbl-head"></thead>
+        <tbody id="tbl-body"></tbody>
+      </table>
+      <div class="pagination">
+        <button class="btn" onclick="prevPage()">← Prev</button>
+        <span class="page-info" id="page-info"></span>
+        <button class="btn" onclick="nextPage()">Next →</button>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <script>
+    // ─── CONFIG ───────────────────────────────────────────────────────────────────
+    // Change this if your CSV file has a different name
+    const CSV_FILE = 'iup_metadata.csv';
+    const PAGE_SIZE = 25;
+
+    // Column name aliases — handles different naming from the server
+    // Left side = what we call it, Right side = possible column names in the CSV
+    const FIELD_MAP = {
+      company: ['nama_usaha', 'NAMA_PERUSAHAAN', 'NamaPerusahaan', 'Nama Perusahaan'],
+      komoditas: ['komoditas', 'KOMODITAS', 'Komoditas'],
+      izin: ['jenis_izin', 'JENIS_IZIN', 'JenisIzin', 'Jenis Izin'],
+      provinsi: ['nama_prov', 'NAMA_PROVINSI', 'NamaProvinsi', 'Provinsi'],
+      kabupaten: ['nama_kab', 'NAMA_KABUPATEN', 'NamaKabupaten', 'Kabupaten'],
+      lokasi: ['lokasi', 'LOKASI_TAMBANG', 'LokasiTambang', 'Lokasi Tambang'],
+      luas: ['luas_sk', 'LUAS_WILAYAH', 'LuasWilayah', 'Luas (Ha)'],
+      status: ['cnc', 'STATUS_CNC', 'StatusCNC', 'Status CNC'],
+      sk: ['sk_iup', 'NOMOR_SK', 'NomorSK', 'Nomor SK'],
+    };
+
+    const CHART_COLORS = ['#378ADD', '#1D9E75', '#D85A30', '#BA7517', '#D4537E', '#7F77DD', '#639922', '#E24B4A', '#888780', '#0F6E56'];
+
+    // ─── STATE ────────────────────────────────────────────────────────────────────
+    let allRows = [], filtered = [], page = 0;
+    let fieldIndex = {};   // maps alias → actual CSV column name
+    let charts = {};
+
+    // ─── FIELD DETECTION ─────────────────────────────────────────────────────────
+    function detectFields(firstRow) {
+      const keys = Object.keys(firstRow);
+      for (const [alias, candidates] of Object.entries(FIELD_MAP)) {
+        for (const c of candidates) {
+          if (keys.includes(c)) { fieldIndex[alias] = c; break; }
+        }
+      }
+      console.log('Detected fields:', fieldIndex);
+    }
+
+    function f(alias) { return fieldIndex[alias] || null; }
+    function val(row, alias) { const k = f(alias); return k ? (row[k] || '') : ''; }
+
+    // ─── STATS ────────────────────────────────────────────────────────────────────
+    function buildStats(rows) {
+      const totalArea = f('luas')
+        ? rows.reduce((s, r) => s + (parseFloat(r[f('luas')]) || 0), 0)
+        : null;
+      const stats = [
+        { label: 'Total records', value: rows.length.toLocaleString() },
+        { label: 'Commodities', value: f('komoditas') ? new Set(rows.map(r => r[f('komoditas')])).size : '—' },
+        { label: 'Provinces', value: f('provinsi') ? new Set(rows.map(r => r[f('provinsi')])).size : '—' },
+        { label: 'Total area (Ha)', value: totalArea ? Math.round(totalArea).toLocaleString() : '—' },
+      ];
+      document.getElementById('stat-cards').innerHTML = stats.map(s => `
+    <div class="stat-card">
+      <div class="label">${s.label}</div>
+      <div class="value">${s.value}</div>
+    </div>`).join('');
+    }
+
+    // ─── CHARTS ──────────────────────────────────────────────────────────────────
+    function countBy(rows, field) {
+      if (!field) return {};
+      const m = {};
+      rows.forEach(r => { const v = r[field] || 'Unknown'; m[v] = (m[v] || 0) + 1; });
+      return m;
+    }
+    function topN(obj, n) {
+      return Object.entries(obj).sort((a, b) => b[1] - a[1]).slice(0, n);
+    }
+
+    function makeChart(id, type, labels, data) {
+      if (charts[id]) charts[id].destroy();
+      const ctx = document.getElementById(id).getContext('2d');
+      charts[id] = new Chart(ctx, {
+        type,
+        data: { labels, datasets: [{ data, backgroundColor: CHART_COLORS, borderWidth: 0 }] },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          plugins: { legend: { position: type === 'bar' ? 'none' : 'right', labels: { font: { size: 11 }, boxWidth: 12, padding: 8 } } },
+          scales: type === 'bar' ? {
+            x: { ticks: { font: { size: 11 }, maxRotation: 30 }, grid: { display: false } },
+            y: { ticks: { font: { size: 11 } }, grid: { color: 'rgba(0,0,0,0.05)' } }
+          } : {}
+        }
+      });
+    }
+
+    function buildCharts(rows) {
+      const kd = topN(countBy(rows, f('komoditas')), 8);
+      const id = topN(countBy(rows, f('izin')), 8);
+      const pd = topN(countBy(rows, f('provinsi')), 10);
+      if (kd.length) makeChart('chart-komoditas', 'doughnut', kd.map(x => x[0]), kd.map(x => x[1]));
+      if (id.length) makeChart('chart-izin', 'doughnut', id.map(x => x[0]), id.map(x => x[1]));
+      if (pd.length) makeChart('chart-provinsi', 'bar', pd.map(x => x[0]), pd.map(x => x[1]));
+    }
+
+    // ─── FILTERS ─────────────────────────────────────────────────────────────────
+    function fillSelect(elId, alias, placeholder) {
+      const el = document.getElementById(elId);
+      const field = f(alias);
+      if (!field) { el.style.display = 'none'; return; }
+      const vals = [...new Set(allRows.map(r => r[field]).filter(Boolean))].sort();
+      el.innerHTML = `<option value="">All ${placeholder}</option>` + vals.map(v => `<option>${v}</option>`).join('');
+      el.onchange = applyFilters;
+    }
+
+    function applyFilters() {
+      const kv = document.getElementById('f-komoditas').value;
+      const pv = document.getElementById('f-provinsi').value;
+      const iv = document.getElementById('f-izin').value;
+      const sv = document.getElementById('f-search').value.toLowerCase();
+      filtered = allRows.filter(r => {
+        if (kv && val(r, 'komoditas') !== kv) return false;
+        if (pv && val(r, 'provinsi') !== pv) return false;
+        if (iv && val(r, 'izin') !== iv) return false;
+        if (sv) {
+          const line = Object.values(r).join(' ').toLowerCase();
+          if (!line.includes(sv)) return false;
+        }
+        return true;
+      });
+      page = 0;
+      renderPage();
+    }
+
+    // ─── TABLE ────────────────────────────────────────────────────────────────────
+    const TABLE_COLS = [
+      { alias: 'company', label: 'Nama Perusahaan', width: '22%' },
+      { alias: 'komoditas', label: 'Komoditas', width: '11%' },
+      { alias: 'izin', label: 'Jenis Izin', width: '10%' },
+      { alias: 'provinsi', label: 'Provinsi', width: '14%' },
+      { alias: 'kabupaten', label: 'Kabupaten', width: '14%' },
+      { alias: 'luas', label: 'Luas (Ha)', width: '10%' },
+      { alias: 'status', label: 'Status CNC', width: '9%' },
+    ];
+
+    function buildTableHeader() {
+      const activeCols = TABLE_COLS.filter(c => f(c.alias));
+      document.getElementById('tbl-head').innerHTML = `<tr>` +
+        activeCols.map(c => `<th style="width:${c.width}">${c.label}</th>`).join('') + `</tr>`;
+      return activeCols;
+    }
+
+    let activeCols = [];
+    function renderPage() {
+      const start = page * PAGE_SIZE;
+      const slice = filtered.slice(start, start + PAGE_SIZE);
+      document.getElementById('tbl-body').innerHTML = slice.map(r => `
+    <tr>${activeCols.map(c => `<td title="${val(r, c.alias)}">${val(r, c.alias) || '—'}</td>`).join('')}</tr>
+  `).join('');
+      document.getElementById('page-info').textContent =
+        `Page ${page + 1} of ${Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))} — ${filtered.length.toLocaleString()} records`;
+      document.getElementById('row-count').textContent = `${filtered.length.toLocaleString()} results`;
+    }
+
+    function prevPage() { if (page > 0) { page--; renderPage(); } }
+    function nextPage() { if ((page + 1) * PAGE_SIZE < filtered.length) { page++; renderPage(); } }
+
+    // ─── LOAD CSV ─────────────────────────────────────────────────────────────────
+    async function loadCSV() {
+      let text;
+      try {
+        const res = await fetch(CSV_FILE);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        text = await res.text();
+      } catch (e) {
+        document.getElementById('stat-cards').innerHTML = `
+      <div class="stat-card no-data" style="grid-column:1/-1">
+        <h2>CSV file not found</h2>
+        <p>Make sure <code>${CSV_FILE}</code> is in the same folder as this HTML file,<br>
+        then refresh the page.</p>
+        <p style="margin-top:8px;font-size:12px;color:#aaa;">Error: ${e.message}</p>
+      </div>`;
+        return;
+      }
+
+      const result = Papa.parse(text, { header: true, skipEmptyLines: true, dynamicTyping: false });
+      allRows = result.data;
+      filtered = [...allRows];
+
+      detectFields(allRows[0] || {});
+      buildStats(allRows);
+      buildCharts(allRows);
+      fillSelect('f-komoditas', 'komoditas', 'commodities');
+      fillSelect('f-provinsi', 'provinsi', 'provinces');
+      fillSelect('f-izin', 'izin', 'permit types');
+      activeCols = buildTableHeader();
+      document.getElementById('f-search').addEventListener('input', applyFilters);
+      renderPage();
+    }
+
+    loadCSV();
+  </script>
+</body>
+
+</html>

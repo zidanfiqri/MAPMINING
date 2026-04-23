@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Data WIUP Minerba Indonesia – ESDM</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Segoe UI',sans-serif;background:#0f172a;color:#e5e7eb;min-height:100vh;}
+
+  /* NAV */
+  nav{
+    position:sticky;top:0;z-index:100;
+    background:#0a0f1e;border-bottom:1px solid #1e3a5f;
+    padding:0 32px;height:56px;
+    display:flex;align-items:center;gap:16px;
+  }
+  nav .logo{font-size:15px;font-weight:700;color:#f59e0b;letter-spacing:.3px;}
+  nav .logo span{color:#7ecbff;}
+  nav .nav-links{margin-left:auto;display:flex;gap:8px;}
+  nav .nav-links a{
+    font-size:13px;color:#94a3b8;text-decoration:none;
+    padding:6px 14px;border-radius:6px;transition:all .2s;
+  }
+  nav .nav-links a:hover{background:#1e293b;color:#e5e7eb;}
+  nav .nav-links a.cta{background:#16213e;color:#f59e0b;border:1px solid #2d4a7a;}
+  nav .nav-links a.cta:hover{background:#1e3a5f;}
+
+  /* HERO */
+  .hero{
+    text-align:center;padding:80px 24px 60px;
+    background:linear-gradient(180deg,#0a0f1e 0%,#0f172a 100%);
+  }
+  .hero .badge{
+    display:inline-block;background:#1e293b;border:1px solid #2d4a7a;
+    color:#7ecbff;font-size:12px;padding:4px 14px;border-radius:20px;margin-bottom:20px;
+  }
+  .hero h1{font-size:42px;font-weight:700;line-height:1.2;margin-bottom:16px;}
+  .hero h1 span{color:#f59e0b;}
+  .hero p{font-size:16px;color:#94a3b8;max-width:560px;margin:0 auto 36px;line-height:1.7;}
+  .hero-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
+  .hero-btns a{
+    padding:12px 28px;border-radius:8px;font-size:14px;font-weight:600;
+    text-decoration:none;transition:all .2s;
+  }
+  .btn-primary{background:#f59e0b;color:#0a0f1e;}
+  .btn-primary:hover{background:#fbbf24;}
+  .btn-secondary{background:transparent;color:#e5e7eb;border:1px solid #334155;}
+  .btn-secondary:hover{background:#1e293b;border-color:#475569;}
+
+  /* STATS */
+  .stats{
+    display:flex;justify-content:center;gap:0;
+    background:#111827;border-top:1px solid #1e293b;border-bottom:1px solid #1e293b;
+    flex-wrap:wrap;
+  }
+  .stat{
+    padding:28px 40px;text-align:center;flex:1;min-width:160px;
+    border-right:1px solid #1e293b;
+  }
+  .stat:last-child{border-right:none;}
+  .stat .num{font-size:32px;font-weight:700;color:#f59e0b;}
+  .stat .lbl{font-size:13px;color:#64748b;margin-top:4px;}
+
+  /* TOOLS */
+  .section{padding:64px 24px;}
+  .section-title{text-align:center;margin-bottom:48px;}
+  .section-title h2{font-size:28px;font-weight:700;color:#f1f5f9;}
+  .section-title p{font-size:14px;color:#64748b;margin-top:8px;}
+
+  .tools{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:24px;max-width:900px;margin:0 auto;}
+  .tool-card{
+    background:#111827;border:1px solid #1e293b;border-radius:16px;
+    padding:32px;display:flex;flex-direction:column;gap:16px;
+    transition:border-color .2s,transform .2s;
+  }
+  .tool-card:hover{border-color:#2d4a7a;transform:translateY(-3px);}
+  .tool-icon{font-size:36px;}
+  .tool-card h3{font-size:20px;font-weight:700;color:#f1f5f9;}
+  .tool-card p{font-size:14px;color:#64748b;line-height:1.7;flex:1;}
+  .tool-features{list-style:none;display:flex;flex-direction:column;gap:6px;}
+  .tool-features li{font-size:13px;color:#94a3b8;}
+  .tool-features li::before{content:"✓ ";color:#22c55e;}
+  .tool-card a{
+    display:block;text-align:center;padding:10px 20px;
+    background:#16213e;color:#f59e0b;border:1px solid #2d4a7a;
+    border-radius:8px;font-size:14px;font-weight:600;text-decoration:none;
+    transition:all .2s;margin-top:4px;
+  }
+  .tool-card a:hover{background:#1e3a5f;}
+
+  /* DATA SECTION */
+  .data-section{
+    background:#111827;border-top:1px solid #1e293b;border-bottom:1px solid #1e293b;
+    padding:64px 24px;
+  }
+  .data-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;max-width:900px;margin:0 auto;}
+  .data-card{
+    background:#0f172a;border:1px solid #1e293b;border-radius:12px;
+    padding:20px 24px;
+  }
+  .data-card .file-name{font-size:13px;font-weight:700;color:#7ecbff;margin-bottom:6px;font-family:monospace;}
+  .data-card .file-desc{font-size:13px;color:#64748b;line-height:1.5;}
+  .data-card .file-size{font-size:12px;color:#475569;margin-top:8px;}
+
+  /* ABOUT */
+  .about{padding:64px 24px;max-width:760px;margin:0 auto;text-align:center;}
+  .about h2{font-size:26px;font-weight:700;color:#f1f5f9;margin-bottom:16px;}
+  .about p{font-size:15px;color:#64748b;line-height:1.8;margin-bottom:12px;}
+
+  /* FOOTER */
+  footer{
+    border-top:1px solid #1e293b;padding:24px 32px;
+    display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;
+    font-size:13px;color:#475569;
+  }
+  footer a{color:#64748b;text-decoration:none;}
+  footer a:hover{color:#94a3b8;}
+
+  @media(max-width:600px){
+    .hero h1{font-size:28px;}
+    .stat{padding:20px 20px;}
+    nav .nav-links a:not(.cta){display:none;}
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">Minerba <span>WIUP</span></div>
+  <div class="nav-links">
+    <a href="iup_explorer.html">Data Explorer</a>
+    <a href="iup_map.html">Peta IUP</a>
+    <a href="iup_map.html" class="cta">Buka Peta →</a>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="badge">Data Resmi ESDM Geoportal Indonesia</div>
+  <h1>Data Wilayah Izin<br/>Usaha Pertambangan<br/><span>Indonesia</span></h1>
+  <p>
+    Agregasi data WIUP dari API resmi ESDM, mencakup lebih dari 8.600 izin tambang
+    beserta batas wilayah, komoditas, dan status perizinan seluruh Indonesia.
+  </p>
+  <div class="hero-btns">
+    <a href="iup_map.html" class="btn-primary">Lihat Peta Interaktif</a>
+    <a href="iup_explorer.html" class="btn-secondary">Jelajahi Data</a>
+  </div>
+</div>
+
+<div class="stats">
+  <div class="stat">
+    <div class="num">8.606</div>
+    <div class="lbl">Total Izin Tambang</div>
+  </div>
+  <div class="stat">
+    <div class="num">34</div>
+    <div class="lbl">Provinsi</div>
+  </div>
+  <div class="stat">
+    <div class="num">20+</div>
+    <div class="lbl">Jenis Komoditas</div>
+  </div>
+  <div class="stat">
+    <div class="num">13 MB</div>
+    <div class="lbl">Data Geometri</div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-title">
+    <h2>Alat Eksplorasi Data</h2>
+    <p>Dua tools interaktif untuk menganalisis dan memvisualisasikan data WIUP</p>
+  </div>
+  <div class="tools">
+    <div class="tool-card">
+      <div class="tool-icon">🗺️</div>
+      <h3>Peta Interaktif IUP</h3>
+      <p>Visualisasikan batas wilayah izin tambang di seluruh Indonesia di atas peta. Cari berdasarkan nama perusahaan dan lihat detail perizinan.</p>
+      <ul class="tool-features">
+        <li>Polygon batas wilayah tambang</li>
+        <li>Pencarian berdasarkan perusahaan</li>
+        <li>Detail IUP saat diklik</li>
+        <li>Basemap OpenStreetMap</li>
+      </ul>
+      <a href="iup_map.html">Buka Peta →</a>
+    </div>
+    <div class="tool-card">
+      <div class="tool-icon">📊</div>
+      <h3>IUP Data Explorer</h3>
+      <p>Dashboard analitik dengan grafik distribusi komoditas, jenis izin, dan provinsi. Filter dan telusuri seluruh 8.600+ rekaman secara langsung.</p>
+      <ul class="tool-features">
+        <li>Statistik ringkasan & grafik</li>
+        <li>Filter multi-kolom</li>
+        <li>Tabel paginasi interaktif</li>
+        <li>Distribusi per provinsi & komoditas</li>
+      </ul>
+      <a href="iup_explorer.html">Buka Explorer →</a>
+    </div>
+  </div>
+</div>
+
+<div class="data-section">
+  <div class="section-title">
+    <h2>File Data Tersedia</h2>
+    <p>Dataset mentah tersedia dalam berbagai format untuk analisis lebih lanjut</p>
+  </div>
+  <div class="data-grid">
+    <div class="data-card">
+      <div class="file-name">iup_metadata.csv</div>
+      <div class="file-desc">Metadata lengkap 8.606 IUP: nama perusahaan, komoditas, provinsi, luas, status, dan tanggal berlaku.</div>
+      <div class="file-size">2,2 MB · CSV · Siap dibuka di Excel</div>
+    </div>
+    <div class="data-card">
+      <div class="file-name">iup_geometry.geojson</div>
+      <div class="file-desc">Batas wilayah polygon setiap IUP dalam format GeoJSON. Dapat dibuka di QGIS, ArcGIS, atau Kepler.gl.</div>
+      <div class="file-size">13 MB · GeoJSON · Kompatibel dengan GIS</div>
+    </div>
+    <div class="data-card">
+      <div class="file-name">Iup data.json</div>
+      <div class="file-desc">Tabel lookup terindeks berdasarkan kode WIUP untuk integrasi dengan aplikasi atau skrip Python.</div>
+      <div class="file-size">4 MB · JSON · Terindeks per kode WIUP</div>
+    </div>
+    <div class="data-card">
+      <div class="file-name">minerba_scraper.py</div>
+      <div class="file-desc">Skrip Python untuk memperbarui data dari API resmi ESDM Geoportal. Jalankan ulang kapan saja.</div>
+      <div class="file-size">9 KB · Python 3 · requests + pandas</div>
+    </div>
+  </div>
+</div>
+
+<div class="about">
+  <h2>Tentang Proyek Ini</h2>
+  <p>
+    Data diambil dari <strong>ESDM Geoportal</strong> (geoportal.esdm.go.id) melalui layer WIUP
+    (Wilayah Izin Usaha Pertambangan) yang merupakan data resmi pemerintah Indonesia.
+  </p>
+  <p>
+    Proyek ini bertujuan untuk mempermudah akses dan analisis data perizinan tambang
+    bagi peneliti, jurnalis, dan pemangku kebijakan.
+  </p>
+</div>
+
+<footer>
+  <span>Data WIUP Minerba Indonesia · Sumber: ESDM Geoportal</span>
+  <span>Diperbarui: April 2026 · 8.606 rekaman</span>
+</footer>
+
+</body>
+</html>

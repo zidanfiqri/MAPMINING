@@ -1,0 +1,11 @@
+# Ketik di terminal
+py -m http.server 8000
+______________________
+
+# Chrom copy & paste
+http://localhost:8000/iup_map.html
+______________________
+
+
+
+
