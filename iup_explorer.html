@@ -286,7 +286,6 @@
 
   <div class="wrap">
 
-    <!-- Stat cards -->
     <div class="stat-grid" id="stat-cards">
       <div class="stat-card">
         <div class="label">Status</div>
@@ -294,7 +293,6 @@
       </div>
     </div>
 
-    <!-- Charts -->
     <div class="chart-grid">
       <div class="chart-box">
         <h3>Records by commodity</h3><canvas id="chart-komoditas" height="220"></canvas>
@@ -307,7 +305,6 @@
       <h3>Top 10 provinces by permit count</h3><canvas id="chart-provinsi" height="130"></canvas>
     </div>
 
-    <!-- Filters -->
     <div class="filter-bar">
       <h3>Filter &amp; Search</h3>
       <div class="filters">
@@ -319,7 +316,6 @@
       </div>
     </div>
 
-    <!-- Table -->
     <div class="table-wrap">
       <table>
         <thead id="tbl-head"></thead>
@@ -360,7 +356,7 @@
     let fieldIndex = {};  
     let charts = {};
 
-    // ─── FIELD DETECTION ─────────────────────────────────────────────────────────
+    // ─── UTILS & SECURITY ─────────────────────────────────────────────────────────
     function detectFields(firstRow) {
       const keys = Object.keys(firstRow);
       for (const [alias, candidates] of Object.entries(FIELD_MAP)) {
@@ -372,24 +368,29 @@
 
     function f(alias) { return fieldIndex[alias] || null; }
     
-    // --- PERBAIKAN FUNGSI VAL: Mencegah HTML/Tag <br> merusak tabel ---
     function val(row, alias) { 
       const k = f(alias); 
       let v = k ? (row[k] || '') : ''; 
       if (typeof v === 'string') {
-        // Hapus enter, tab, dan spasi ganda
         v = v.replace(/[\r\n\t]+/g, ' ').replace(/\s{2,}/g, ' ').trim();
-        // Ubah tag HTML seperti <br> menjadi teks biasa agar tabel tidak memanjang ke bawah
-        v = v.replace(/</g, '&lt;').replace(/>/g, '&gt;');
       }
       return v; 
     }
 
-    // ─── STATS ────────────────────────────────────────────────────────────────────
+    // FUNGSI INI SANGAT PENTING: Mencegah tanda kutip (") merusak elemen HTML
+    function escapeHTML(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    // ─── STATS & CHARTS ───────────────────────────────────────────────────────────
     function buildStats(rows) {
-      const totalArea = f('luas')
-        ? rows.reduce((s, r) => s + (parseFloat(r[f('luas')]) || 0), 0)
-        : null;
+      const totalArea = f('luas') ? rows.reduce((s, r) => s + (parseFloat(r[f('luas')]) || 0), 0) : null;
       const stats = [
         { label: 'Total records', value: rows.length.toLocaleString() },
         { label: 'Commodities', value: f('komoditas') ? new Set(rows.map(r => r[f('komoditas')])).size : '—' },
@@ -397,22 +398,20 @@
         { label: 'Total area (Ha)', value: totalArea ? Math.round(totalArea).toLocaleString() : '—' },
       ];
       document.getElementById('stat-cards').innerHTML = stats.map(s => `
-    <div class="stat-card">
-      <div class="label">${s.label}</div>
-      <div class="value">${s.value}</div>
-    </div>`).join('');
+        <div class="stat-card">
+          <div class="label">${s.label}</div>
+          <div class="value">${s.value}</div>
+        </div>`).join('');
     }
 
-    // ─── CHARTS ──────────────────────────────────────────────────────────────────
     function countBy(rows, field) {
       if (!field) return {};
       const m = {};
       rows.forEach(r => { const v = r[field] || 'Unknown'; m[v] = (m[v] || 0) + 1; });
       return m;
     }
-    function topN(obj, n) {
-      return Object.entries(obj).sort((a, b) => b[1] - a[1]).slice(0, n);
-    }
+
+    function topN(obj, n) { return Object.entries(obj).sort((a, b) => b[1] - a[1]).slice(0, n); }
 
     function makeChart(id, type, labels, data) {
       if (charts[id]) charts[id].destroy();
@@ -446,7 +445,7 @@
       const field = f(alias);
       if (!field) { el.style.display = 'none'; return; }
       const vals = [...new Set(allRows.map(r => r[field]).filter(Boolean))].sort();
-      el.innerHTML = `<option value="">All ${placeholder}</option>` + vals.map(v => `<option>${v}</option>`).join('');
+      el.innerHTML = `<option value="">All ${placeholder}</option>` + vals.map(v => `<option>${escapeHTML(v)}</option>`).join('');
       el.onchange = applyFilters;
     }
 
@@ -491,9 +490,15 @@
     function renderPage() {
       const start = page * PAGE_SIZE;
       const slice = filtered.slice(start, start + PAGE_SIZE);
+      
+      // DI SINI KITA MENGGUNAKAN escapeHTML UNTUK MENGUNCI TAMPILAN
       document.getElementById('tbl-body').innerHTML = slice.map(r => `
-    <tr>${activeCols.map(c => `<td title="${val(r, c.alias)}">${val(r, c.alias) || '—'}</td>`).join('')}</tr>
-  `).join('');
+        <tr>${activeCols.map(c => {
+          const safeData = escapeHTML(val(r, c.alias));
+          return `<td title="${safeData}">${safeData || '—'}</td>`;
+        }).join('')}</tr>
+      `).join('');
+      
       document.getElementById('page-info').textContent =
         `Page ${page + 1} of ${Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))} — ${filtered.length.toLocaleString()} records`;
       document.getElementById('row-count').textContent = `${filtered.length.toLocaleString()} results`;
@@ -520,14 +525,13 @@
         return;
       }
 
-      // --- PERBAIKAN CLEANUP DATA ---
-      // 1. Seragamkan enter (Penting agar tidak ada sisa \r yang mengganggu pembacaan baris)
+      // 1. Seragamkan format enter
       text = text.replace(/\r\n/g, '\n');
       
-      // 2. Hapus titik koma (;;;;) yang ada di akhir setiap baris
-      text = text.replace(/;+$/gm, '');
+      // 2. Hapus titik koma (;;;;) dan spasi tersembunyi di akhir baris (PENTING!)
+      text = text.replace(/;+\s*$/gm, '');
       
-      // 3. Hapus tanda kutip yang membungkus satu baris penuh
+      // 3. Buka bungkus kutip ganda pada keseluruhan baris
       text = text.split('\n').map(line => {
         let t = line.trim();
         if (t.startsWith('"') && t.endsWith('"')) {
@@ -554,7 +558,6 @@
 
       filtered = [...allRows];
       
-      // 5. Kembalikan pemanggilan fungsi buildStats yang terhapus sebelumnya
       buildStats(allRows);
       buildCharts(allRows);
       fillSelect('f-komoditas', 'komoditas', 'commodities');
