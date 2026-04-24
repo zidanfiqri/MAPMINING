@@ -28,7 +28,6 @@
     .chart-box-full { margin-bottom: 20px; }
     .chart-box h3, .chart-box-full h3 { font-size: 13px; color: #666; margin-bottom: 12px; font-weight: 500; }
     
-    /* --- KUNCI ANTI MELAR GRAFIK (INI YANG MENGHENTIKAN LOOP) --- */
     .canvas-container { position: relative; width: 100%; height: 230px; }
     .canvas-container-full { position: relative; width: 100%; height: 160px; }
 
@@ -59,7 +58,7 @@
   <div id="header">
     <h1>
       📊 IUP Data Explorer 
-      <span style="background:#378ADD;color:#fff;font-size:10px;padding:3px 6px;border-radius:4px;font-weight:bold;">GRAFIK FIX</span>
+      <span style="background:#D85A30;color:#fff;font-size:10px;padding:3px 6px;border-radius:4px;font-weight:bold;">+ FILTER LUAS</span>
     </h1>
     <a href="iup_map.html">🗺 Open Map View →</a>
   </div>
@@ -90,7 +89,14 @@
     <div class="filter-bar">
       <h3>Filter &amp; Search</h3>
       <div class="filters">
-        <select id="f-komoditas"></select><select id="f-provinsi"></select><select id="f-izin"></select>
+        <select id="f-komoditas"></select>
+        <select id="f-provinsi"></select>
+        <select id="f-izin"></select>
+        <select id="f-sort" style="font-weight: 600; color: #D85A30;">
+          <option value="">Urutan Default</option>
+          <option value="asc">Luas: Terkecil - Terbesar</option>
+          <option value="desc">Luas: Terbesar - Terkecil</option>
+        </select>
         <input type="text" id="f-search" placeholder="Search company name…" />
         <span class="row-count" id="row-count"></span>
       </div>
@@ -187,8 +193,16 @@
       el.innerHTML = `<option value="">All ${placeholder}</option>` + vals.map(v => `<option>${escapeHTML(v)}</option>`).join('');
       el.onchange = applyFilters;
     }
+    
+    // --- LOGIKA FILTER DAN URUTAN (SORTING) ---
     function applyFilters() {
-      const kv = document.getElementById('f-komoditas').value, pv = document.getElementById('f-provinsi').value, iv = document.getElementById('f-izin').value, sv = document.getElementById('f-search').value.toLowerCase();
+      const kv = document.getElementById('f-komoditas').value;
+      const pv = document.getElementById('f-provinsi').value;
+      const iv = document.getElementById('f-izin').value;
+      const sv = document.getElementById('f-search').value.toLowerCase();
+      const sortVal = document.getElementById('f-sort').value; // Mengambil nilai urutan
+      
+      // 1. Saring Data Terlebih Dahulu
       filtered = allRows.filter(r => {
         if (kv && val(r, 'komoditas') !== kv) return false;
         if (pv && val(r, 'provinsi') !== pv) return false;
@@ -196,8 +210,17 @@
         if (sv && !Object.values(r).join(' ').toLowerCase().includes(sv)) return false;
         return true;
       });
+
+      // 2. Urutkan Data Berdasarkan Luas
+      if (sortVal === 'asc') {
+        filtered.sort((a, b) => (parseFloat(val(a, 'luas')) || 0) - (parseFloat(val(b, 'luas')) || 0));
+      } else if (sortVal === 'desc') {
+        filtered.sort((a, b) => (parseFloat(val(b, 'luas')) || 0) - (parseFloat(val(a, 'luas')) || 0));
+      }
+
       page = 0; renderPage();
     }
+
     const TABLE_COLS = [
       { alias: 'company', label: 'Nama Perusahaan', width: '22%' }, { alias: 'komoditas', label: 'Komoditas', width: '11%' },
       { alias: 'izin', label: 'Jenis Izin', width: '10%' }, { alias: 'provinsi', label: 'Provinsi', width: '14%' },
@@ -260,7 +283,13 @@
       
       buildStats(allRows); buildCharts(allRows);
       fillSelect('f-komoditas', 'komoditas', 'commodities'); fillSelect('f-provinsi', 'provinsi', 'provinces'); fillSelect('f-izin', 'izin', 'permit types');
-      buildTableHeader(); document.getElementById('f-search').addEventListener('input', applyFilters); renderPage();
+      buildTableHeader(); 
+      
+      // Tambahkan pendeteksi perubahan pada fungsi filter & dropdown sort
+      document.getElementById('f-search').addEventListener('input', applyFilters); 
+      document.getElementById('f-sort').addEventListener('change', applyFilters); 
+      
+      renderPage();
     }
     loadCSV();
   </script>
