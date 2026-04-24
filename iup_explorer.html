@@ -6,237 +6,54 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>IUP Data Explorer – Minerba ESDM</title>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #f4f5f7;
-      color: #222;
-    }
-
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', sans-serif; background: #f4f5f7; color: #222; }
     #header {
-      background: #16213e;
-      color: #fff;
-      padding: 14px 24px;
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      position: sticky;
-      top: 0;
-      z-index: 100;
+      background: #16213e; color: #fff; padding: 14px 24px;
+      display: flex; align-items: center; gap: 16px; position: sticky; top: 0; z-index: 100;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
     }
-
-    #header h1 {
-      font-size: 16px;
-      font-weight: 600;
-      color: #e2b96f;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    #header a {
-      font-size: 12px;
-      color: #7ecbff;
-      text-decoration: none;
-      margin-left: auto;
-    }
-
-    #header a:hover {
-      text-decoration: underline;
-    }
-
-    .wrap {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 20px;
-    }
-
+    #header h1 { font-size: 16px; font-weight: 600; color: #e2b96f; display: flex; align-items: center; gap: 8px; }
+    #header a { font-size: 12px; color: #7ecbff; text-decoration: none; margin-left: auto; }
+    #header a:hover { text-decoration: underline; }
+    .wrap { max-width: 1200px; margin: 0 auto; padding: 20px; }
+    
     /* Stat cards */
-    .stat-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-      gap: 12px;
-      margin-bottom: 20px;
-    }
-
-    .stat-card {
-      background: #fff;
-      border-radius: 10px;
-      padding: 14px 16px;
-      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
-    }
-
-    .stat-card .label {
-      font-size: 12px;
-      color: #666;
-      margin-bottom: 4px;
-    }
-
-    .stat-card .value {
-      font-size: 26px;
-      font-weight: 600;
-      color: #16213e;
-    }
-
+    .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 20px; }
+    .stat-card { background: #fff; border-radius: 10px; padding: 14px 16px; box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08); }
+    .stat-card .label { font-size: 12px; color: #666; margin-bottom: 4px; }
+    .stat-card .value { font-size: 26px; font-weight: 600; color: #16213e; }
+    
     /* Charts */
-    .chart-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-      margin-bottom: 20px;
-    }
-
-    .chart-box, .chart-box-full {
-      background: #fff;
-      border-radius: 10px;
-      padding: 16px;
-      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
-    }
-
-    .chart-box-full {
-      margin-bottom: 20px;
-    }
-
-    .chart-box h3, .chart-box-full h3 {
-      font-size: 13px;
-      color: #666;
-      margin-bottom: 12px;
-      font-weight: 500;
-    }
-
+    .chart-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+    .chart-box, .chart-box-full { background: #fff; border-radius: 10px; padding: 16px; box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08); }
+    .chart-box-full { margin-bottom: 20px; }
+    .chart-box h3, .chart-box-full h3 { font-size: 13px; color: #666; margin-bottom: 12px; font-weight: 500; }
+    
     /* Filter bar */
-    .filter-bar {
-      background: #fff;
-      border-radius: 10px;
-      padding: 16px;
-      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
-      margin-bottom: 16px;
-    }
-
-    .filter-bar h3 {
-      font-size: 13px;
-      color: #666;
-      margin-bottom: 10px;
-      font-weight: 500;
-    }
-
-    .filters {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      align-items: center;
-    }
-
-    select, input[type=text] {
-      font-size: 13px;
-      padding: 6px 10px;
-      border: 1px solid #ddd;
-      border-radius: 6px;
-      background: #fff;
-      color: #222;
-      outline: none;
-      cursor: pointer;
-    }
-
-    select:focus, input:focus {
-      border-color: #378ADD;
-    }
-
-    input[type=text] {
-      flex: 1;
-      min-width: 180px;
-    }
-
-    .row-count {
-      font-size: 12px;
-      color: #888;
-      white-space: nowrap;
-    }
-
-    button.btn {
-      font-size: 12px;
-      padding: 6px 14px;
-      border: 1px solid #ddd;
-      border-radius: 6px;
-      background: #fff;
-      cursor: pointer;
-      color: #222;
-    }
-
-    button.btn:hover {
-      background: #f0f0f0;
-    }
-
+    .filter-bar { background: #fff; border-radius: 10px; padding: 16px; box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08); margin-bottom: 16px; }
+    .filter-bar h3 { font-size: 13px; color: #666; margin-bottom: 10px; font-weight: 500; }
+    .filters { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+    select, input[type=text] { font-size: 13px; padding: 6px 10px; border: 1px solid #ddd; border-radius: 6px; background: #fff; color: #222; outline: none; }
+    select:focus, input:focus { border-color: #378ADD; }
+    input[type=text] { flex: 1; min-width: 180px; }
+    .row-count { font-size: 12px; color: #888; white-space: nowrap; }
+    button.btn { font-size: 12px; padding: 6px 14px; border: 1px solid #ddd; border-radius: 6px; background: #fff; cursor: pointer; color: #222; }
+    button.btn:hover { background: #f0f0f0; }
+    
     /* Table */
-    .table-wrap {
-      background: #fff;
-      border-radius: 10px;
-      padding: 16px;
-      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
-      overflow-x: auto;
+    .table-wrap { background: #fff; border-radius: 10px; padding: 16px; box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08); overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; table-layout: fixed; }
+    thead th { text-align: left; padding: 8px 10px; font-size: 12px; font-weight: 600; color: #555; border-bottom: 2px solid #eee; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    tbody tr:hover { background: #f7f9fc; }
+    tbody td { 
+      padding: 7px 10px; border-bottom: 1px solid #f0f0f0; 
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 0; color: #333; 
     }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 13px;
-      table-layout: fixed;
-    }
-
-    thead th {
-      text-align: left;
-      padding: 8px 10px;
-      font-size: 12px;
-      font-weight: 600;
-      color: #555;
-      border-bottom: 2px solid #eee;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    tbody tr:hover {
-      background: #f7f9fc;
-    }
-
-    /* --- KUNCI RAHASIA CSS DI SINI --- */
-    tbody td {
-      padding: 7px 10px;
-      border-bottom: 1px solid #f0f0f0;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      max-width: 0; /* Ini memaksa tabel browser berhenti melar ke bawah */
-      color: #333;
-    }
-
-    .pagination {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-      margin-top: 12px;
-    }
-
-    .page-info {
-      font-size: 12px;
-      color: #888;
-    }
-
-    .no-data {
-      text-align: center;
-      padding: 40px;
-      color: #888;
-    }
-
-    @media (max-width:640px) {
-      .chart-grid { grid-template-columns: 1fr; }
-    }
+    .pagination { display: flex; gap: 8px; align-items: center; margin-top: 12px; }
+    .page-info { font-size: 12px; color: #888; }
+    .no-data { text-align: center; padding: 40px; color: #888; }
+    @media (max-width:640px) { .chart-grid { grid-template-columns: 1fr; } }
   </style>
 </head>
 
@@ -245,7 +62,7 @@
   <div id="header">
     <h1>
       📊 IUP Data Explorer 
-      <span style="background:#e24b4a;color:#fff;font-size:10px;padding:3px 6px;border-radius:4px;font-weight:bold;">VERSI FINAL</span>
+      <span style="background:#1D9E75;color:#fff;font-size:10px;padding:3px 6px;border-radius:4px;font-weight:bold;">VERSI ANTI-MELAR</span>
     </h1>
     <a href="iup_map.html">🗺 Open Map View →</a>
   </div>
@@ -257,30 +74,19 @@
         <div class="value" id="load-status" style="font-size:14px;color:#888;">Loading CSV…</div>
       </div>
     </div>
-
     <div class="chart-grid">
-      <div class="chart-box">
-        <h3>Records by commodity</h3><canvas id="chart-komoditas" height="220"></canvas>
-      </div>
-      <div class="chart-box">
-        <h3>Records by permit type</h3><canvas id="chart-izin" height="220"></canvas>
-      </div>
+      <div class="chart-box"><h3>Records by commodity</h3><canvas id="chart-komoditas" height="220"></canvas></div>
+      <div class="chart-box"><h3>Records by permit type</h3><canvas id="chart-izin" height="220"></canvas></div>
     </div>
-    <div class="chart-box-full">
-      <h3>Top 10 provinces by permit count</h3><canvas id="chart-provinsi" height="130"></canvas>
-    </div>
-
+    <div class="chart-box-full"><h3>Top 10 provinces by permit count</h3><canvas id="chart-provinsi" height="130"></canvas></div>
     <div class="filter-bar">
       <h3>Filter &amp; Search</h3>
       <div class="filters">
-        <select id="f-komoditas"></select>
-        <select id="f-provinsi"></select>
-        <select id="f-izin"></select>
+        <select id="f-komoditas"></select><select id="f-provinsi"></select><select id="f-izin"></select>
         <input type="text" id="f-search" placeholder="Search company name…" />
         <span class="row-count" id="row-count"></span>
       </div>
     </div>
-
     <div class="table-wrap">
       <table>
         <thead id="tbl-head"></thead>
@@ -299,7 +105,6 @@
   <script>
     const CSV_FILE = 'iup_metadata.csv';
     const PAGE_SIZE = 25;
-
     const FIELD_MAP = {
       company: ['nama_usaha', 'NAMA_PERUSAHAAN', 'NamaPerusahaan', 'Nama Perusahaan'],
       komoditas: ['komoditas', 'KOMODITAS', 'Komoditas'],
@@ -311,43 +116,26 @@
       status: ['cnc', 'STATUS_CNC', 'StatusCNC', 'Status CNC'],
       sk: ['sk_iup', 'NOMOR_SK', 'NomorSK', 'Nomor SK'],
     };
-
     const CHART_COLORS = ['#378ADD', '#1D9E75', '#D85A30', '#BA7517', '#D4537E', '#7F77DD', '#639922', '#E24B4A', '#888780', '#0F6E56'];
 
-    let allRows = [], filtered = [], page = 0;
-    let fieldIndex = {};  
-    let charts = {};
+    let allRows = [], filtered = [], page = 0, fieldIndex = {}, charts = {};
 
     function detectFields(firstRow) {
       const keys = Object.keys(firstRow);
       for (const [alias, candidates] of Object.entries(FIELD_MAP)) {
-        for (const c of candidates) {
-          if (keys.includes(c)) { fieldIndex[alias] = c; break; }
-        }
+        for (const c of candidates) { if (keys.includes(c)) { fieldIndex[alias] = c; break; } }
       }
     }
-
     function f(alias) { return fieldIndex[alias] || null; }
-    
     function val(row, alias) { 
-      const k = f(alias); 
-      let v = k ? (row[k] || '') : ''; 
-      if (typeof v === 'string') {
-        v = v.replace(/[\r\n\t]+/g, ' ').replace(/\s{2,}/g, ' ').trim();
-      }
+      let v = f(alias) ? (row[f(alias)] || '') : ''; 
+      if (typeof v === 'string') v = v.replace(/[\r\n\t]+/g, ' ').replace(/\s{2,}/g, ' ').trim();
       return v; 
     }
-
     function escapeHTML(str) {
       if (!str) return '';
-      return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;');
+      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
     }
-
     function buildStats(rows) {
       const totalArea = f('luas') ? rows.reduce((s, r) => s + (parseFloat(r[f('luas')]) || 0), 0) : null;
       const stats = [
@@ -357,109 +145,69 @@
         { label: 'Total area (Ha)', value: totalArea ? Math.round(totalArea).toLocaleString() : '—' },
       ];
       document.getElementById('stat-cards').innerHTML = stats.map(s => `
-        <div class="stat-card">
-          <div class="label">${s.label}</div>
-          <div class="value">${s.value}</div>
-        </div>`).join('');
+        <div class="stat-card"><div class="label">${s.label}</div><div class="value">${s.value}</div></div>`).join('');
     }
-
     function countBy(rows, field) {
       if (!field) return {};
       const m = {};
       rows.forEach(r => { const v = r[field] || 'Unknown'; m[v] = (m[v] || 0) + 1; });
       return m;
     }
-
     function topN(obj, n) { return Object.entries(obj).sort((a, b) => b[1] - a[1]).slice(0, n); }
-
     function makeChart(id, type, labels, data) {
       if (charts[id]) charts[id].destroy();
-      const ctx = document.getElementById(id).getContext('2d');
-      charts[id] = new Chart(ctx, {
-        type,
-        data: { labels, datasets: [{ data, backgroundColor: CHART_COLORS, borderWidth: 0 }] },
+      charts[id] = new Chart(document.getElementById(id).getContext('2d'), {
+        type, data: { labels, datasets: [{ data, backgroundColor: CHART_COLORS, borderWidth: 0 }] },
         options: {
           responsive: true, maintainAspectRatio: false,
           plugins: { legend: { position: type === 'bar' ? 'none' : 'right', labels: { font: { size: 11 }, boxWidth: 12, padding: 8 } } },
-          scales: type === 'bar' ? {
-            x: { ticks: { font: { size: 11 }, maxRotation: 30 }, grid: { display: false } },
-            y: { ticks: { font: { size: 11 } }, grid: { color: 'rgba(0,0,0,0.05)' } }
-          } : {}
+          scales: type === 'bar' ? { x: { ticks: { font: { size: 11 }, maxRotation: 30 }, grid: { display: false } }, y: { ticks: { font: { size: 11 } }, grid: { color: 'rgba(0,0,0,0.05)' } } } : {}
         }
       });
     }
-
     function buildCharts(rows) {
-      const kd = topN(countBy(rows, f('komoditas')), 8);
-      const id = topN(countBy(rows, f('izin')), 8);
-      const pd = topN(countBy(rows, f('provinsi')), 10);
+      const kd = topN(countBy(rows, f('komoditas')), 8), id = topN(countBy(rows, f('izin')), 8), pd = topN(countBy(rows, f('provinsi')), 10);
       if (kd.length) makeChart('chart-komoditas', 'doughnut', kd.map(x => x[0]), kd.map(x => x[1]));
       if (id.length) makeChart('chart-izin', 'doughnut', id.map(x => x[0]), id.map(x => x[1]));
       if (pd.length) makeChart('chart-provinsi', 'bar', pd.map(x => x[0]), pd.map(x => x[1]));
     }
-
     function fillSelect(elId, alias, placeholder) {
-      const el = document.getElementById(elId);
-      const field = f(alias);
+      const el = document.getElementById(elId), field = f(alias);
       if (!field) { el.style.display = 'none'; return; }
       const vals = [...new Set(allRows.map(r => r[field]).filter(Boolean))].sort();
       el.innerHTML = `<option value="">All ${placeholder}</option>` + vals.map(v => `<option>${escapeHTML(v)}</option>`).join('');
       el.onchange = applyFilters;
     }
-
     function applyFilters() {
-      const kv = document.getElementById('f-komoditas').value;
-      const pv = document.getElementById('f-provinsi').value;
-      const iv = document.getElementById('f-izin').value;
-      const sv = document.getElementById('f-search').value.toLowerCase();
+      const kv = document.getElementById('f-komoditas').value, pv = document.getElementById('f-provinsi').value, iv = document.getElementById('f-izin').value, sv = document.getElementById('f-search').value.toLowerCase();
       filtered = allRows.filter(r => {
         if (kv && val(r, 'komoditas') !== kv) return false;
         if (pv && val(r, 'provinsi') !== pv) return false;
         if (iv && val(r, 'izin') !== iv) return false;
-        if (sv) {
-          const line = Object.values(r).join(' ').toLowerCase();
-          if (!line.includes(sv)) return false;
-        }
+        if (sv && !Object.values(r).join(' ').toLowerCase().includes(sv)) return false;
         return true;
       });
-      page = 0;
-      renderPage();
+      page = 0; renderPage();
     }
-
     const TABLE_COLS = [
-      { alias: 'company', label: 'Nama Perusahaan', width: '22%' },
-      { alias: 'komoditas', label: 'Komoditas', width: '11%' },
-      { alias: 'izin', label: 'Jenis Izin', width: '10%' },
-      { alias: 'provinsi', label: 'Provinsi', width: '14%' },
-      { alias: 'kabupaten', label: 'Kabupaten', width: '14%' },
-      { alias: 'luas', label: 'Luas (Ha)', width: '10%' },
+      { alias: 'company', label: 'Nama Perusahaan', width: '22%' }, { alias: 'komoditas', label: 'Komoditas', width: '11%' },
+      { alias: 'izin', label: 'Jenis Izin', width: '10%' }, { alias: 'provinsi', label: 'Provinsi', width: '14%' },
+      { alias: 'kabupaten', label: 'Kabupaten', width: '14%' }, { alias: 'luas', label: 'Luas (Ha)', width: '10%' },
       { alias: 'status', label: 'Status CNC', width: '9%' },
     ];
-
-    function buildTableHeader() {
-      const activeCols = TABLE_COLS.filter(c => f(c.alias));
-      document.getElementById('tbl-head').innerHTML = `<tr>` +
-        activeCols.map(c => `<th style="width:${c.width}">${c.label}</th>`).join('') + `</tr>`;
-      return activeCols;
-    }
-
     let activeCols = [];
+    function buildTableHeader() {
+      activeCols = TABLE_COLS.filter(c => f(c.alias));
+      document.getElementById('tbl-head').innerHTML = `<tr>${activeCols.map(c => `<th style="width:${c.width}">${c.label}</th>`).join('')}</tr>`;
+    }
     function renderPage() {
-      const start = page * PAGE_SIZE;
-      const slice = filtered.slice(start, start + PAGE_SIZE);
-      
-      document.getElementById('tbl-body').innerHTML = slice.map(r => `
-        <tr>${activeCols.map(c => {
-          const safeData = escapeHTML(val(r, c.alias));
-          return `<td title="${safeData}">${safeData || '—'}</td>`;
-        }).join('')}</tr>
-      `).join('');
-      
-      document.getElementById('page-info').textContent =
-        `Page ${page + 1} of ${Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))} — ${filtered.length.toLocaleString()} records`;
+      const start = page * PAGE_SIZE, slice = filtered.slice(start, start + PAGE_SIZE);
+      document.getElementById('tbl-body').innerHTML = slice.map(r => `<tr>${activeCols.map(c => {
+          const safeData = escapeHTML(val(r, c.alias)); return `<td title="${safeData}">${safeData || '—'}</td>`;
+        }).join('')}</tr>`).join('');
+      document.getElementById('page-info').textContent = `Page ${page + 1} of ${Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))} — ${filtered.length.toLocaleString()} records`;
       document.getElementById('row-count').textContent = `${filtered.length.toLocaleString()} results`;
     }
-
     function prevPage() { if (page > 0) { page--; renderPage(); } }
     function nextPage() { if ((page + 1) * PAGE_SIZE < filtered.length) { page++; renderPage(); } }
 
@@ -470,55 +218,53 @@
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         text = await res.text();
       } catch (e) {
-        document.getElementById('stat-cards').innerHTML = `
-      <div class="stat-card no-data" style="grid-column:1/-1">
-        <h2>CSV file not found</h2>
-        <p>Make sure <code>${CSV_FILE}</code> is in the same folder as this HTML file,<br>
-        then refresh the page.</p>
-        <p style="margin-top:8px;font-size:12px;color:#aaa;">Error: ${e.message}</p>
-      </div>`;
+        document.getElementById('stat-cards').innerHTML = `<div class="stat-card no-data" style="grid-column:1/-1"><h2>CSV file not found</h2><p>Error: ${e.message}</p></div>`;
         return;
       }
 
+      // --- LOGIKA PENGHANCUR TANDA KUTIP RUSAK (REVOLUSIONER) ---
       text = text.replace(/\r\n/g, '\n');
       text = text.replace(/;+\s*$/gm, '');
-      text = text.split('\n').map(line => {
-        let t = line.trim();
-        if (t.startsWith('"') && t.endsWith('"')) {
+      
+      let lines = text.split('\n');
+      let cleanLines = [];
+      
+      for(let i=0; i < lines.length; i++) {
+        let t = lines[i].trim();
+        if(!t) continue;
+        
+        // 1. Jika baris ini terbungkus penuh oleh tanda kutip (Efek buruk Excel)
+        if (t.startsWith('"') && t.endsWith('"') && t.length > 1) {
           t = t.substring(1, t.length - 1).replace(/""/g, '"');
         }
-        return t;
-      }).join('\n');
-
-      const result = Papa.parse(text, { 
-        header: true, 
-        skipEmptyLines: true, 
-        dynamicTyping: false,
-        delimiter: "," 
-      });
+        
+        // 2. Amankan semua KOMA yang ada di dalam tanda kutip (diubah jadi strip)
+        t = t.replace(/"([^"]*)"/g, function(match, innerText) {
+          return innerText.replace(/,/g, ' - '); 
+        });
+        
+        // 3. Hancurkan SEMUA tanda kutip yang tersisa. Ini menjamin PapaParse tidak akan pernah error menelan baris ke bawah!
+        t = t.replace(/"/g, '');
+        
+        cleanLines.push(t);
+      }
       
+      text = cleanLines.join('\n');
+      // -----------------------------------------------------------
+
+      const result = Papa.parse(text, { header: true, skipEmptyLines: true, dynamicTyping: false, delimiter: "," });
       allRows = result.data;
       detectFields(allRows[0] || {});
 
-      allRows = allRows.filter(r => {
-        const comp = val(r, 'company');
-        return comp && comp !== '' && comp !== '—';
-      });
-
+      // Hapus baris siluman
+      allRows = allRows.filter(r => { const comp = val(r, 'company'); return comp && comp !== '' && comp !== '—'; });
       filtered = [...allRows];
       
-      buildStats(allRows);
-      buildCharts(allRows);
-      fillSelect('f-komoditas', 'komoditas', 'commodities');
-      fillSelect('f-provinsi', 'provinsi', 'provinces');
-      fillSelect('f-izin', 'izin', 'permit types');
-      activeCols = buildTableHeader();
-      document.getElementById('f-search').addEventListener('input', applyFilters);
-      renderPage();
+      buildStats(allRows); buildCharts(allRows);
+      fillSelect('f-komoditas', 'komoditas', 'commodities'); fillSelect('f-provinsi', 'provinsi', 'provinces'); fillSelect('f-izin', 'izin', 'permit types');
+      buildTableHeader(); document.getElementById('f-search').addEventListener('input', applyFilters); renderPage();
     }
-
     loadCSV();
   </script>
 </body>
-
 </html>
