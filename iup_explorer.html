@@ -35,6 +35,9 @@
       font-size: 16px;
       font-weight: 600;
       color: #e2b96f;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
 
     #header a {
@@ -89,29 +92,18 @@
       margin-bottom: 20px;
     }
 
-    .chart-box {
+    .chart-box, .chart-box-full {
       background: #fff;
       border-radius: 10px;
       padding: 16px;
       box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
-    }
-
-    .chart-box h3 {
-      font-size: 13px;
-      color: #666;
-      margin-bottom: 12px;
-      font-weight: 500;
     }
 
     .chart-box-full {
-      background: #fff;
-      border-radius: 10px;
-      padding: 16px;
-      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
       margin-bottom: 20px;
     }
 
-    .chart-box-full h3 {
+    .chart-box h3, .chart-box-full h3 {
       font-size: 13px;
       color: #666;
       margin-bottom: 12px;
@@ -141,8 +133,7 @@
       align-items: center;
     }
 
-    select,
-    input[type=text] {
+    select, input[type=text] {
       font-size: 13px;
       padding: 6px 10px;
       border: 1px solid #ddd;
@@ -153,8 +144,7 @@
       cursor: pointer;
     }
 
-    select:focus,
-    input:focus {
+    select:focus, input:focus {
       border-color: #378ADD;
     }
 
@@ -181,16 +171,6 @@
 
     button.btn:hover {
       background: #f0f0f0;
-    }
-
-    button.btn-primary {
-      background: #16213e;
-      color: #e2b96f;
-      border-color: #16213e;
-    }
-
-    button.btn-primary:hover {
-      background: #1e2d5a;
     }
 
     /* Table */
@@ -225,12 +205,14 @@
       background: #f7f9fc;
     }
 
+    /* --- KUNCI RAHASIA CSS DI SINI --- */
     tbody td {
       padding: 7px 10px;
       border-bottom: 1px solid #f0f0f0;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      max-width: 0; /* Ini memaksa tabel browser berhenti melar ke bawah */
       color: #333;
     }
 
@@ -246,33 +228,14 @@
       color: #888;
     }
 
-    /* No data state */
     .no-data {
       text-align: center;
       padding: 40px;
       color: #888;
     }
 
-    .no-data h2 {
-      font-size: 16px;
-      margin-bottom: 8px;
-    }
-
-    .no-data p {
-      font-size: 13px;
-    }
-
-    .no-data code {
-      background: #f0f0f0;
-      padding: 2px 6px;
-      border-radius: 4px;
-      font-size: 12px;
-    }
-
     @media (max-width:640px) {
-      .chart-grid {
-        grid-template-columns: 1fr;
-      }
+      .chart-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -280,12 +243,14 @@
 <body>
 
   <div id="header">
-    <h1>📊 IUP Data Explorer – Minerba ESDM</h1>
+    <h1>
+      📊 IUP Data Explorer 
+      <span style="background:#e24b4a;color:#fff;font-size:10px;padding:3px 6px;border-radius:4px;font-weight:bold;">VERSI FINAL</span>
+    </h1>
     <a href="iup_map.html">🗺 Open Map View →</a>
   </div>
 
   <div class="wrap">
-
     <div class="stat-grid" id="stat-cards">
       <div class="stat-card">
         <div class="label">Status</div>
@@ -327,13 +292,11 @@
         <button class="btn" onclick="nextPage()">Next →</button>
       </div>
     </div>
-
   </div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
   <script>
-    // ─── CONFIG ───────────────────────────────────────────────────────────────────
     const CSV_FILE = 'iup_metadata.csv';
     const PAGE_SIZE = 25;
 
@@ -351,12 +314,10 @@
 
     const CHART_COLORS = ['#378ADD', '#1D9E75', '#D85A30', '#BA7517', '#D4537E', '#7F77DD', '#639922', '#E24B4A', '#888780', '#0F6E56'];
 
-    // ─── STATE ────────────────────────────────────────────────────────────────────
     let allRows = [], filtered = [], page = 0;
     let fieldIndex = {};  
     let charts = {};
 
-    // ─── UTILS & SECURITY ─────────────────────────────────────────────────────────
     function detectFields(firstRow) {
       const keys = Object.keys(firstRow);
       for (const [alias, candidates] of Object.entries(FIELD_MAP)) {
@@ -377,7 +338,6 @@
       return v; 
     }
 
-    // FUNGSI INI SANGAT PENTING: Mencegah tanda kutip (") merusak elemen HTML
     function escapeHTML(str) {
       if (!str) return '';
       return String(str)
@@ -388,7 +348,6 @@
         .replace(/'/g, '&#39;');
     }
 
-    // ─── STATS & CHARTS ───────────────────────────────────────────────────────────
     function buildStats(rows) {
       const totalArea = f('luas') ? rows.reduce((s, r) => s + (parseFloat(r[f('luas')]) || 0), 0) : null;
       const stats = [
@@ -439,7 +398,6 @@
       if (pd.length) makeChart('chart-provinsi', 'bar', pd.map(x => x[0]), pd.map(x => x[1]));
     }
 
-    // ─── FILTERS ─────────────────────────────────────────────────────────────────
     function fillSelect(elId, alias, placeholder) {
       const el = document.getElementById(elId);
       const field = f(alias);
@@ -468,7 +426,6 @@
       renderPage();
     }
 
-    // ─── TABLE ────────────────────────────────────────────────────────────────────
     const TABLE_COLS = [
       { alias: 'company', label: 'Nama Perusahaan', width: '22%' },
       { alias: 'komoditas', label: 'Komoditas', width: '11%' },
@@ -491,7 +448,6 @@
       const start = page * PAGE_SIZE;
       const slice = filtered.slice(start, start + PAGE_SIZE);
       
-      // DI SINI KITA MENGGUNAKAN escapeHTML UNTUK MENGUNCI TAMPILAN
       document.getElementById('tbl-body').innerHTML = slice.map(r => `
         <tr>${activeCols.map(c => {
           const safeData = escapeHTML(val(r, c.alias));
@@ -507,7 +463,6 @@
     function prevPage() { if (page > 0) { page--; renderPage(); } }
     function nextPage() { if ((page + 1) * PAGE_SIZE < filtered.length) { page++; renderPage(); } }
 
-    // ─── LOAD CSV ─────────────────────────────────────────────────────────────────
     async function loadCSV() {
       let text;
       try {
@@ -525,13 +480,8 @@
         return;
       }
 
-      // 1. Seragamkan format enter
       text = text.replace(/\r\n/g, '\n');
-      
-      // 2. Hapus titik koma (;;;;) dan spasi tersembunyi di akhir baris (PENTING!)
       text = text.replace(/;+\s*$/gm, '');
-      
-      // 3. Buka bungkus kutip ganda pada keseluruhan baris
       text = text.split('\n').map(line => {
         let t = line.trim();
         if (t.startsWith('"') && t.endsWith('"')) {
@@ -550,7 +500,6 @@
       allRows = result.data;
       detectFields(allRows[0] || {});
 
-      // 4. Buang baris siluman
       allRows = allRows.filter(r => {
         const comp = val(r, 'company');
         return comp && comp !== '' && comp !== '—';
