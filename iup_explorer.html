@@ -375,7 +375,15 @@
     }
 
     function f(alias) { return fieldIndex[alias] || null; }
-    function val(row, alias) { const k = f(alias); return k ? (row[k] || '') : ''; }
+    function val(row, alias) { 
+  const k = f(alias); 
+  let v = k ? (row[k] || '') : ''; 
+  // Bersihkan karakter "Enter" dan spasi berlebih di dalam teks
+  if (typeof v === 'string') {
+    v = v.replace(/[\r\n]+/g, ' ').replace(/\s{2,}/g, ' ').trim();
+  }
+  return v; 
+}
 
     // ─── STATS ────────────────────────────────────────────────────────────────────
     function buildStats(rows) {
@@ -529,16 +537,21 @@
       // Tambahkan delimiter: "," secara eksplisit
       const result = Papa.parse(text, { 
         header: true, 
-        skipEmptyLines: true, 
+        skipEmptyLines: 'greedy', // Ubah jadi greedy agar baris yang isinya cuma koma dibuang
         dynamicTyping: false,
         delimiter: "," 
       });
       
       allRows = result.data;
-      filtered = [...allRows];
-
       detectFields(allRows[0] || {});
-      buildStats(allRows);
+
+      // FILTER TAMBAHAN: Buang baris "siluman" yang tidak punya Nama Perusahaan
+      allRows = allRows.filter(r => {
+        const comp = val(r, 'company');
+        return comp && comp !== '';
+      });
+
+      filtered = [...allRows];
       buildCharts(allRows);
       fillSelect('f-komoditas', 'komoditas', 'commodities');
       fillSelect('f-provinsi', 'provinsi', 'provinces');
