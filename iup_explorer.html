@@ -494,7 +494,7 @@
     function prevPage() { if (page > 0) { page--; renderPage(); } }
     function nextPage() { if ((page + 1) * PAGE_SIZE < filtered.length) { page++; renderPage(); } }
 
-    // ─── LOAD CSV ─────────────────────────────────────────────────────────────────
+// ─── LOAD CSV ─────────────────────────────────────────────────────────────────
     async function loadCSV() {
       let text;
       try {
@@ -512,7 +512,28 @@
         return;
       }
 
-      const result = Papa.parse(text, { header: true, skipEmptyLines: true, dynamicTyping: false });
+      // --- TAMBAHAN KODE PEMBERSIH CSV MULAI DI SINI ---
+      // 1. Hapus titik koma (;;;;) yang ada di akhir setiap baris
+      text = text.replace(/;+$/gm, '');
+      
+      // 2. Hapus tanda kutip yang membungkus satu baris penuh (Kutu dari Excel)
+      text = text.split('\n').map(line => {
+        let t = line.trim();
+        if (t.startsWith('"') && t.endsWith('"')) {
+          t = t.substring(1, t.length - 1).replace(/""/g, '"');
+        }
+        return t;
+      }).join('\n');
+      // --- TAMBAHAN KODE SELESAI ---
+
+      // Tambahkan delimiter: "," secara eksplisit
+      const result = Papa.parse(text, { 
+        header: true, 
+        skipEmptyLines: true, 
+        dynamicTyping: false,
+        delimiter: "," 
+      });
+      
       allRows = result.data;
       filtered = [...allRows];
 
