@@ -338,12 +338,9 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
   <script>
     // ─── CONFIG ───────────────────────────────────────────────────────────────────
-    // Change this if your CSV file has a different name
     const CSV_FILE = 'iup_metadata.csv';
     const PAGE_SIZE = 25;
 
-    // Column name aliases — handles different naming from the server
-    // Left side = what we call it, Right side = possible column names in the CSV
     const FIELD_MAP = {
       company: ['nama_usaha', 'NAMA_PERUSAHAAN', 'NamaPerusahaan', 'Nama Perusahaan'],
       komoditas: ['komoditas', 'KOMODITAS', 'Komoditas'],
@@ -360,7 +357,7 @@
 
     // ─── STATE ────────────────────────────────────────────────────────────────────
     let allRows = [], filtered = [], page = 0;
-    let fieldIndex = {};   // maps alias → actual CSV column name
+    let fieldIndex = {};  
     let charts = {};
 
     // ─── FIELD DETECTION ─────────────────────────────────────────────────────────
@@ -371,19 +368,22 @@
           if (keys.includes(c)) { fieldIndex[alias] = c; break; }
         }
       }
-      console.log('Detected fields:', fieldIndex);
     }
 
     function f(alias) { return fieldIndex[alias] || null; }
+    
+    // --- PERBAIKAN FUNGSI VAL: Mencegah HTML/Tag <br> merusak tabel ---
     function val(row, alias) { 
-  const k = f(alias); 
-  let v = k ? (row[k] || '') : ''; 
-  // Bersihkan karakter "Enter" dan spasi berlebih di dalam teks
-  if (typeof v === 'string') {
-    v = v.replace(/[\r\n]+/g, ' ').replace(/\s{2,}/g, ' ').trim();
-  }
-  return v; 
-}
+      const k = f(alias); 
+      let v = k ? (row[k] || '') : ''; 
+      if (typeof v === 'string') {
+        // Hapus enter, tab, dan spasi ganda
+        v = v.replace(/[\r\n\t]+/g, ' ').replace(/\s{2,}/g, ' ').trim();
+        // Ubah tag HTML seperti <br> menjadi teks biasa agar tabel tidak memanjang ke bawah
+        v = v.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      }
+      return v; 
+    }
 
     // ─── STATS ────────────────────────────────────────────────────────────────────
     function buildStats(rows) {
@@ -502,7 +502,7 @@
     function prevPage() { if (page > 0) { page--; renderPage(); } }
     function nextPage() { if ((page + 1) * PAGE_SIZE < filtered.length) { page++; renderPage(); } }
 
-// ─── LOAD CSV ─────────────────────────────────────────────────────────────────
+    // ─── LOAD CSV ─────────────────────────────────────────────────────────────────
     async function loadCSV() {
       let text;
       try {
@@ -520,11 +520,14 @@
         return;
       }
 
-      // --- TAMBAHAN KODE PEMBERSIH CSV MULAI DI SINI ---
-      // 1. Hapus titik koma (;;;;) yang ada di akhir setiap baris
+      // --- PERBAIKAN CLEANUP DATA ---
+      // 1. Seragamkan enter (Penting agar tidak ada sisa \r yang mengganggu pembacaan baris)
+      text = text.replace(/\r\n/g, '\n');
+      
+      // 2. Hapus titik koma (;;;;) yang ada di akhir setiap baris
       text = text.replace(/;+$/gm, '');
       
-      // 2. Hapus tanda kutip yang membungkus satu baris penuh (Kutu dari Excel)
+      // 3. Hapus tanda kutip yang membungkus satu baris penuh
       text = text.split('\n').map(line => {
         let t = line.trim();
         if (t.startsWith('"') && t.endsWith('"')) {
@@ -532,12 +535,10 @@
         }
         return t;
       }).join('\n');
-      // --- TAMBAHAN KODE SELESAI ---
 
-      // Tambahkan delimiter: "," secara eksplisit
       const result = Papa.parse(text, { 
         header: true, 
-        skipEmptyLines: 'greedy', // Ubah jadi greedy agar baris yang isinya cuma koma dibuang
+        skipEmptyLines: true, 
         dynamicTyping: false,
         delimiter: "," 
       });
@@ -545,13 +546,16 @@
       allRows = result.data;
       detectFields(allRows[0] || {});
 
-      // FILTER TAMBAHAN: Buang baris "siluman" yang tidak punya Nama Perusahaan
+      // 4. Buang baris siluman
       allRows = allRows.filter(r => {
         const comp = val(r, 'company');
-        return comp && comp !== '';
+        return comp && comp !== '' && comp !== '—';
       });
 
       filtered = [...allRows];
+      
+      // 5. Kembalikan pemanggilan fungsi buildStats yang terhapus sebelumnya
+      buildStats(allRows);
       buildCharts(allRows);
       fillSelect('f-komoditas', 'komoditas', 'commodities');
       fillSelect('f-provinsi', 'provinsi', 'provinces');
